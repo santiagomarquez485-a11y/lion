@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geoclima Global | El Niño & Súper Niño</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #0f172a;
+            --primary-light: #1e293b;
+            --accent-warm: #f97316;
+            --accent-danger: #ef4444;
+            --accent-cool: #0284c7;
+            --bg-light: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* Barra de Alerta Superior */
+        .top-bar {
+            background: linear-gradient(90deg, #dc2626, #ea580c);
+            color: white;
+            text-align: center;
+            padding: 8px 16px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* Header y Navegación */
+        header {
+            background-color: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            gap: 1.5rem;
+        }
+
+        .nav-left, .nav-right {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            gap: 1.5rem;
+        }
+
+        .logo {
+            color: #fff;
+            font-size: 1.4rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 1rem;
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: var(--accent-warm);
+        }
+
+        nav ul li a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        nav ul li a:hover {
+            color: var(--accent-warm);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.75)), 
+                        url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+            min-height: 70vh;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 4rem 1.5rem;
+        }
+
+        .hero-content {
+            max-width: 850px;
+        }
+
+        .hero-badge {
+            background: rgba(249, 115, 22, 0.2);
+            color: #fdba74;
+            border: 1px solid rgba(249, 115, 22, 0.4);
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 1.25rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #94a3b8;
+            margin-bottom: 2rem;
+        }
+
+        /* Tarjetas de Métricas Rápidas */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            max-width: 1280px;
+            margin: -3rem auto 3rem;
+            padding: 0 1.5rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            text-align: center;
+        }
+
+        .stat-card .num {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--accent-warm);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* Contenedor Principal */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.5rem 4rem;
+        }
+
+        section {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 3rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            scroll-margin-top: 100px;
+        }
+
+        .section-header {
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+            color: var(--primary);
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+
+        h2::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: var(--accent-warm);
+            margin-top: 8px;
+            border-radius: 2px;
+        }
+
+        .lead-text {
+            font-size: 1.1rem;
+            color: #475569;
+        }
+
+        /* Grillas y Módulos */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            align-items: center;
+            margin-top: 2rem;
+        }
+
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius);
+            padding: 1.75rem;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px -5px rgba(0,0,0,0.08);
+            border-color: var(--accent-warm);
+        }
+
+        .card h3 {
+            color: var(--primary);
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        /* Imagen con Estilos */
+        .img-wrapper {
+            position: relative;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            margin: 1.5rem 0;
+        }
+
+        .img-wrapper img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: var(--transition);
+        }
+
+        .img-wrapper:hover img {
+            transform: scale(1.02);
+        }
+
+        .caption {
+            background: rgba(15, 23, 42, 0.85);
+            color: #f1f5f9;
+            padding: 10px 16px;
+            font-size: 0.85rem;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+
+        /* Tabla Comparativa */
+        .table-responsive {
+            overflow-x: auto;
+            margin-top: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        /* FAQ Desplegable */
+        details {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            padding: 1rem 1.25rem;
+            transition: var(--transition);
+        }
+
+        details[open] {
+            background: #fff;
+            border-color: var(--accent-warm);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        summary {
+            font-weight: 700;
+            color: var(--primary);
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        summary::after {
+            content: '+';
+            font-size: 1.4rem;
+            color: var(--accent-warm);
+        }
+
+        details[open] summary::after {
+            content: '−';
+        }
+
+        details p {
+            margin-top: 1rem;
+            color: var(--text-main);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--primary);
+            color: #94a3b8;
+            padding: 4rem 1.5rem 2rem;
+        }
+
+        .footer-grid {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-col h4 {
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-col p {
+            font-size: 0.9rem;
+        }
+
+        .footer-bottom {
+            max-width: 1280px;
+            margin: 0 auto;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 1.5rem;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-left {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+
+            section {
+                padding: 1.75rem;
+            }
+
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Barra de Estado / Alerta Climática -->
+    <div class="top-bar">
+        ⚠️ ESTADO ACTUAL: Monitoreo Activo ENOS - Zona Niños 3.4 bajo Vigilancia Meteorológica Global
+    </div>
+
+    <!-- Navegación Simplificada -->
+    <header>
+        <nav>
+            <ul class="nav-left">
+                <li><a href="#" class="logo">🌐 GeoClima <span>Global</span></a></li>
+                <li><a href="#" onclick="abrirEnProceso(event, 'Educación Ambiental')">Educación Ambiental</a></li>
+                <li><a href="#" onclick="abrirEnProceso(event, 'Lengua Castellana')">Lengua Castellana</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="hero-content">
+            <span class="hero-badge">Oceanografía & Climatología</span>
+            <h1>El Fenómeno de El Niño y los Eventos Súper Niño</h1>
+            <p>Descubre los complejos mecanismos oceánico-atmosféricos que modulan las temperaturas globales, perturban la economía planetaria y reconfiguran los patrones de precipitación.</p>
+        </div>
+    </div>
+
+    <!-- Métricas Clave Rápidas -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="num">+2.0 °C</div>
+            <div class="label">Umbral térmico marino para calificar un "Súper Niño"</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">2 a 7</div>
+            <div class="label">Años entre el retorno de cada ciclo de ENOS</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">$3.5T</div>
+            <div class="label">Pérdidas macroeconómicas globales estimadas (Evento 1997-98)</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">98%</div>
+            <div class="label">De correlación con episodios de blanqueamiento coralino masivo</div>
+        </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div class="container">
+
+        <!-- SECCIÓN 1: INTRODUCCIÓN AL ENOS -->
+        <section id="enos">
+            <div class="section-header">
+                <h2>1. ¿Qué es el Fenómeno ENOS?</h2>
+                <p class="lead-text">El sistema océano-atmósfera del Pacífico ecuatorial y su ciclo oscilatorio natural.</p>
+            </div>
+
+            <p>El fenómeno conocido globalmente como <strong>El Niño - Oscilación del Sur (ENOS)</strong> representa la fluctuación interanual más potente del sistema climático terrestre. No es simplemente un evento meteorológico aislado, sino un acoplamiento complejo entre la capa superficial del Océano Pacífico Ecuatorial y la tropósfera.</p>
+
+            <div class="grid-2">
+                <div>
+                    <h3>Las Tres Fases del Ciclo:</h3>
+                    <ul>
+                        <li><strong>Fase Neutra:</strong> Vientos alisios estables. Las temperaturas marinas se mantienen en sus promedios históricos normales.</li>
+                        <li><strong>El Niño (Fase Cálida):</strong> Calentamiento anómalo en el Pacífico central y oriental. Suprime los vientos alisios y altera la circulación global.</li>
+                        <li><strong>La Niña (Fase Fría):</strong> Enfriamiento anómalo de las aguas ecuatoriales impulsado por un fortalecimiento inusual de los alisios.</li>
+                    </ul>
+                </div>
+                <div class="img-wrapper">
+                    <img src="https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&fit=crop&w=1000&q=80" alt="Superficie Marina del Océano Pacífico">
+                    <div class="caption">La transferencia de calor latente desde el océano impulsa tormentas extremas a nivel global.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 2: MECANISMO ATMOSFÉRICO -->
+        <section id="mecanismo">
+            <div class="section-header">
+                <h2>2. Dinámica de la Circulación de Walker</h2>
+                <p class="lead-text">Cómo la alteración de los vientos alisios desplaza las masas de agua y cambia el clima global.</p>
+            </div>
+
+            <div class="grid-2">
+                <div>
+                    <h3>Condiciones Normales vs. El Niño</h3>
+                    <p>En estado neutro, la <strong>Circulación de Walker</strong> arrastra las aguas cálidas superficiales hacia el oeste (Indonesia y Filipinas), favoreciendo la <em>surgencia</em> de aguas frías y ricas en nutrientes frente a las costas de Sudamérica (Perú y Ecuador).</p>
+                    <p>Durante El Niño, los vientos alisios pierden fuerza o invierten su dirección. La masa de agua cálida acumulada en el Pacífico Oeste fluye de regreso hacia el este en forma de <strong>Ondas Kelvin Oceanográficas</strong>, bloqueando el afloramiento de nutrientes marinos y desplazando la convección atmosférica activa hacia el centro de América.</p>
+                </div>
+                <div class="card" style="background: #eff6ff; border-color: #bfdbfe;">
+                    <h3 style="color: #1e40af;">📌 La Zona Niño 3.4</h3>
+                    <p>Es la región geográfica clave (delimitada entre los 5°N–5°S y 120°W–170°W) utilizada por agencias como la <strong>NOAA</strong> y la <strong>OMM</strong> para calcular el Índice de El Niño Oceánico (ONI). Una anomalía sustained superior a +0.5 °C confirma la presencia del fenómeno.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 3: SÚPER NIÑO -->
+        <section id="super-nino">
+            <div class="section-header">
+                <h2>3. El Fenómeno "Súper Niño"</h2>
+                <p class="lead-text">Episodios extremos donde la anomalía térmica quiebra todos los parámetros históricos.</p>
+            </div>
+
+            <p>Aunque "Súper Niño" no es un término categórico formal en los manuales de la OMM, la comunidad científica califica de esta manera a aquellos eventos en los que las anomalías de la Temperatura de la Superficie del Mar (TSM) superan los <strong>+2.0 °C</strong> por encima del promedio durante períodos prolongados.</p>
+
+            <div class="grid-cards">
+                <div class="card">
+                    <h3>Súper Niño 1982 - 1983</h3>
+                    <p>Tomó por sorpresa a la comunidad meteorológica internacional. Desencadenó sequías devastadoras en Australia y lluvias torrenciales en las zonas costeras de Perú y Ecuador, transformando desiertos en lagunas.</p>
+                </div>
+                <div class="card">
+                    <h3>Súper Niño 1997 - 1998</h3>
+                    <p>Considerado el evento de mayor escala del siglo XX. Provocó olas de calor marinas sin precedentes, incendios masivos en selvas tropicales e inundaciones graves en múltiples continentes simultáneamente.</p>
+                </div>
+                <div class="card">
+                    <h3>Súper Niño 2015 - 2016</h3>
+                    <p>Impulsado por el calentamiento global antrópico subyacente. Ayudó a que el año 2016 rompiera récords de temperatura global, devastando el 29% del coral somero en la Gran Barrera de Coral.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 4: TABLA COMPARATIVA -->
+        <section id="comparativa">
+            <div class="section-header">
+                <h2>4. Cuadro Comparativo del ENOS</h2>
+                <p class="lead-text">Principales características diferenciales entre las tres manifestaciones del ciclo.</p>
+            </div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Característica</th>
+                            <th>La Niña (Fase Fría)</th>
+                            <th>El Niño (Fase Cálida Moderada)</th>
+                            <th>Súper Niño (Fase Extrema)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Anomalía Térmica (TSM)</strong></td>
+                            <td>Inf. a -0.5 °C</td>
+                            <td>De +0.5 °C a +1.9 °C</td>
+                            <td>Mayor o igual a +2.0 °C</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Vientos Alisios</strong></td>
+                            <td>Extremadamente Fuertes</td>
+                            <td>Debilitados o Inactivos</td>
+                            <td>Completamente Invertidos</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Costas de Sudamérica</strong></td>
+                            <td>Aguas muy frías, sequía costera</td>
+                            <td>Lluvias moderadas a fuertes</td>
+                            <td>Precipitaciones récord e inundaciones</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Australia / Indonesia</strong></td>
+                            <td>Monzones intensos, inundaciones</td>
+                            <td>Condiciones secas, riesgo de incendios</td>
+                            <td>Sequías catastróficas e incendios fuera de control</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Impacto en Corales</strong></td>
+                            <td>Bajo riesgo de blanqueamiento</td>
+                            <td>Blanqueamiento localizado</td>
+                            <td>Colapso masivo global de arrecifes</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 5: IMPACTOS GLOBALES -->
+        <section id="impactos">
+            <div class="section-header">
+                <h2>5. Impactos Ecológicos y Socioeconómicos</h2>
+                <p class="lead-text">El efecto dominó de las anomalías oceánicas en la cadena alimentaria y los mercados.</p>
+            </div>
+
+            <div class="grid-cards">
+                <div class="card">
+                    <h3>🎣 Colapso Pesquero</h3>
+                    <p>La interrupción de la corriente de Humboldt y el afloramiento reduce el plancton, provocando la migración o mortandad de la anchoveta y otras especies de alto valor comercial.</p>
+                </div>
+                <div class="card">
+                    <h3>🌾 Inseguridad Alimentaria</h3>
+                    <p>Las sequías severas reducen cosechas de café, arroz, caña de azúcar y soya en América Latina y Asia, disparando la inflación de los precios de los alimentos a nivel mundial.</p>
+                </div>
+                <div class="card">
+                    <h3>⚡ Crisis Energética</h3>
+                    <p>En países dependientes de la energía hidroeléctrica (como Colombia y Brasil), la disminución en las reservas de los embalses obliga a implementar racionamientos severos.</p>
+                </div>
+            </div>
+
+            <div class="img-wrapper">
+                <img src="https://images.unsplash.com/photo-1545134969-8debd725b007?auto=format&fit=crop&w=1200&q=80" alt="Suelo Agrietado por Sequía Extrema">
+                <div class="caption">Las sequías e incendios forestales son las consecuencias más graves de los eventos Súper Niño en zonas tropicales.</div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 6: MITIGACIÓN Y PREVENCIÓN -->
+        <section id="mitigacion">
+            <div class="section-header">
+                <h2>6. Mitigación, Alerta Temprana y Resiliencia</h2>
+                <p class="lead-text">Estrategias modernas de anticipación ante eventos climáticos severos.</p>
+            </div>
+
+            <p>Debido a que no es posible evitar la ocurrencia de los ciclos de ENOS, los esfuerzos globales se enfocan en la adaptación y el fortalecimiento de la infraestructura pública:</p>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h3>1. Monitoreo e Inteligencia Climática</h3>
+                    <p>Uso de redes de boyas oceánicas (como la red TAO/TRITON), satélites de altimetría oceánica y supercomputadoras con modelos predictivos respaldados por inteligencia artificial.</p>
+                </div>
+                <div class="card">
+                    <h3>2. Gestión Agrícola Preventiva</h3>
+                    <p>Rotación de cultivos por variedades resistentes a la sequía o alta humedad, alteración de calendarios de siembra e implementación de riego eficiente por goteo.</p>
+                </div>
+                <div class="card">
+                    <h3>3. Infraestructura Urbana Resiliente</h3>
+                    <p>Limpieza de cauces de ríos, construcción de muros de contención, mejora de sistemas de drenaje pluvial y blindaje de las redes de energía y transporte público.</p>
+                </div>
+                <div class="card">
+                    <h3>4. Preparación en Salud Pública</h3>
+                    <p>Planes de contingencia ante vectores de transmisión de enfermedades (dengue, malaria, chikunguña) que se reproducen rápidamente en depósitos de agua estancada.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 7: PREGUNTAS FRECUENTES (FAQ) -->
+        <section id="faq">
+            <div class="section-header">
+                <h2>7. Preguntas Frecuentes</h2>
+                <p class="lead-text">Respuestas rápidas a los interrogantes más comunes sobre El Niño.</p>
+            </div>
+
+            <details>
+                <summary>¿Por qué se llama "El Niño"?</summary>
+                <p>El nombre fue acuñado por pescadores del norte de Perú en el siglo XIX, quienes notaron que una corriente marina cálida aparecía anualmente en torno al período de Navidad. Hicieron referencia al "Niño Jesús".</p>
+            </details>
+
+            <details>
+                <summary>¿El Cambio Climático causa el fenómeno El Niño?</summary>
+                <p>No. El Niño es un ciclo oscilatorio natural que ha existido durante milenios. Sin embargo, el cambio climático antrópico está aumentando la frecuencia de los eventos "Súper Niño" y amplificando la severidad de sus impactos.</p>
+            </details>
+
+            <details>
+                <summary>¿Cuánto dura típicamente un evento El Niño?</summary>
+                <p>Generalmente se extiende de 9 a 12 meses. Suele desarrollarse entre abril y junio, alcanzando su punto máximo entre noviembre y enero del año posterior.</p>
+            </details>
+        </section>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>GeoClima Global</h4>
+                <p>Plataforma dedicada a la divulgación científica, análisis oceanográfico y monitoreo ambiental para la gestión del riesgo de desastres climáticos.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Fuentes & Referencias</h4>
+                <p>• NOAA Climate Prediction Center<br>
+                   • Organización Meteorológica Mundial (OMM)<br>
+                   • IPCC - Grupo Intergubernamental de Expertos<br>
+                   • Instituto del Mar del Perú (IMARPE)</p>
+            </div>
+            <div class="footer-col">
+                <h4>Contacto Educativo</h4>
+                <p>Para consultas académicas o colaboración en proyectos de investigación meteorológica:<br>
+                <strong>contacto@geoclimaglobal.org</strong></p>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 GeoClima Global. Reservados todos los derechos. Diseñado para la investigación y divulgación de las Ciencias de la Tierra.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript para abrir la página "En Proceso" con botón de regreso -->
+    <script>
+        function abrirEnProceso(e, titulo) {
+            e.preventDefault();
+            const nuevaVentana = window.open('', '_blank');
+            
+            nuevaVentana.document.write(`
+                <!DOCTYPE html>
+                <html lang="es">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>${titulo} | En Proceso</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+                    <style>
+                        * {
+                            margin: 0;
+                            padding: 0;
+                            box-sizing: border-box;
+                            font-family: 'Inter', sans-serif;
+                        }
+                        body {
+                            background-color: #0f172a;
+                            color: #ffffff;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            height: 100vh;
+                            text-align: center;
+                            padding: 20px;
+                            position: relative;
+                        }
+                        .btn-volver {
+                            position: absolute;
+                            top: 24px;
+                            right: 24px;
+                            background-color: rgba(255, 255, 255, 0.1);
+                            color: #ffffff;
+                            border: 1px solid rgba(255, 255, 255, 0.2);
+                            padding: 10px 18px;
+                            border-radius: 30px;
+                            font-size: 0.95rem;
+                            font-weight: 600;
+                            cursor: pointer;
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                            transition: all 0.3s ease;
+                            text-decoration: none;
+                        }
+                        .btn-volver:hover {
+                            background-color: #f97316;
+                            border-color: #f97316;
+                            transform: translateX(-3px);
+                        }
+                        .box {
+                            background: #1e293b;
+                            padding: 3rem;
+                            border-radius: 16px;
+                            border: 1px solid #334155;
+                            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+                            max-width: 500px;
+                            width: 100%;
+                        }
+                        .icon {
+                            font-size: 4rem;
+                            margin-bottom: 1rem;
+                        }
+                        h1 {
+                            font-size: 2rem;
+                            color: #f97316;
+                            margin-bottom: 1rem;
+                        }
+                        p {
+                            color: #94a3b8;
+                            margin-bottom: 1.5rem;
+                            line-height: 1.6;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <button class="btn-volver" onclick="window.close()">← Volver / Cerrar</button>
+                    <div class="box">
+                        <div class="icon">🚧</div>
+                        <h1>Sección en Proceso</h1>
+                        <p>El módulo de <strong>${titulo}</strong> se encuentra actualmente bajo desarrollo editorial y pedagógico.</p>
+                    </div>
+                </body>
+                </html>
+            `);
+            nuevaVentana.document.close();
+        }
+    </script>
+</body>
+</html>
